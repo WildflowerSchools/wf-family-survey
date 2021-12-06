@@ -1,10 +1,10 @@
-# MODULE_NAME
+# wf_family_survey
 
-SHORT_DESCRIPTION
+Tools for working with Wildflower Schools family survey data
 
 ## Installation
 
-`pip install PYPI_PACKAGE_NAME`
+`pip install wf-family-survey`
 
 ## Task list
 * TBD

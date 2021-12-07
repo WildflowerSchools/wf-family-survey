@@ -13,8 +13,7 @@ def get_version():
 # Dependencies (format is 'PYPI_PACKAGE_NAME[>]=VERSION_NUMBER')
 BASE_DEPENDENCIES = [
     'wf-core-data-python>=1.3',
-    'pandas>=1.3',
-    'numpy>=1.19'
+    'pandas>=1.3'
 ]
 
 # TEST_DEPENDENCIES = [

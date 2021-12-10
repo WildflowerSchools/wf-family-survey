@@ -10,6 +10,37 @@ logger = logging.getLogger(__name__)
 
 class FamilySurveyTransparentClassroomClient(wf_core_data.TransparentClassroomClient):
 
+    def fetch_family_survey_school_form_template_ids(
+        self,
+        family_survey_network_form_template_ids=None,
+        template_name_re=None,
+        school_ids=None
+    ):
+        if family_survey_network_form_template_ids is None:
+            if template_name_re is None:
+                raise ValueError('Must specify either a set of family survey network form template IDs or regular expression which matchs family survey network form names')
+            family_survey_network_form_template_ids = self.fetch_family_survey_network_form_template_ids(template_name_re)
+        school_form_template_data = self.fetch_family_survey_school_form_template_data(
+            family_survey_network_form_template_ids=family_survey_network_form_template_ids,
+            school_ids=school_ids
+        )
+        family_survey_school_form_template_ids = list(
+            school_form_template_data.index[school_form_template_data['is_family_survey_template']]
+        )
+        return family_survey_school_form_template_ids
+
+    def fetch_family_survey_network_form_template_ids(
+        self,
+        template_name_re
+    ):
+        network_form_template_data = self.fetch_family_survey_network_form_template_data(
+            template_name_re=template_name_re
+        )
+        family_survey_network_form_template_ids = family_survey_network_form_template_ids = list(
+            network_form_template_data.index[network_form_template_data['is_family_survey_template']]
+        )
+        return family_survey_network_form_template_ids
+
     def fetch_family_survey_network_form_template_data(
         self,
         template_name_re

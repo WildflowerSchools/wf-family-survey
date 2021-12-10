@@ -16,18 +16,43 @@ class FamilySurveyTransparentClassroomClient(wf_core_data.TransparentClassroomCl
         template_name_re=None,
         school_ids=None
     ):
-        if family_survey_network_form_template_ids is None:
-            if template_name_re is None:
-                raise ValueError('Must specify either a set of family survey network form template IDs or regular expression which matchs family survey network form names')
-            family_survey_network_form_template_ids = self.fetch_family_survey_network_form_template_ids(template_name_re)
         school_form_template_data = self.fetch_family_survey_school_form_template_data(
             family_survey_network_form_template_ids=family_survey_network_form_template_ids,
+            template_name_re=template_name_re,
             school_ids=school_ids
         )
         family_survey_school_form_template_ids = list(
             school_form_template_data.index[school_form_template_data['is_family_survey_template']]
         )
         return family_survey_school_form_template_ids
+
+    def fetch_family_survey_school_form_template_data(
+        self,
+        family_survey_network_form_template_ids=None,
+        template_name_re=None,
+        school_ids=None
+    ):
+        if family_survey_network_form_template_ids is None:
+            if template_name_re is None:
+                raise ValueError('Must specify either a set of family survey network form template IDs or regular expression which matchs family survey network form names')
+            family_survey_network_form_template_ids = self.fetch_family_survey_network_form_template_ids(template_name_re)
+        form_template_data = self.fetch_form_template_data(
+            school_ids=school_ids,
+            format='dataframe'
+        )
+        form_template_data['is_family_survey_template'] = form_template_data['widgets'].apply(
+            lambda widgets: np.any([
+                (widget.get('type') == 'EmbeddedForm') and (int(widget.get('embedded_form_id')) in family_survey_network_form_template_ids)
+                for widget in widgets
+            ])
+        )
+        form_template_data['is_family_survey_template'] = form_template_data['is_family_survey_template'].astype('bool')
+        form_template_data = form_template_data.reindex(columns=[
+            'form_template_name',
+            'is_family_survey_template'
+        ])
+        form_template_data.sort_values('is_family_survey_template', ascending = False, inplace = True)
+        return form_template_data
 
     def fetch_family_survey_network_form_template_ids(
         self,
@@ -57,26 +82,3 @@ class FamilySurveyTransparentClassroomClient(wf_core_data.TransparentClassroomCl
         ])
         network_form_template_data.sort_values('is_family_survey_template', ascending = False, inplace = True)
         return network_form_template_data
-
-    def fetch_family_survey_school_form_template_data(
-        self,
-        family_survey_network_form_template_ids,
-        school_ids=None
-    ):
-        form_template_data = self.fetch_form_template_data(
-            school_ids=school_ids,
-            format='dataframe'
-        )
-        form_template_data['is_family_survey_template'] = form_template_data['widgets'].apply(
-            lambda widgets: np.any([
-                (widget.get('type') == 'EmbeddedForm') and (int(widget.get('embedded_form_id')) in family_survey_network_form_template_ids)
-                for widget in widgets
-            ])
-        )
-        form_template_data['is_family_survey_template'] = form_template_data['is_family_survey_template'].astype('bool')
-        form_template_data = form_template_data.reindex(columns=[
-            'form_template_name',
-            'is_family_survey_template'
-        ])
-        form_template_data.sort_values('is_family_survey_template', ascending = False, inplace = True)
-        return form_template_data

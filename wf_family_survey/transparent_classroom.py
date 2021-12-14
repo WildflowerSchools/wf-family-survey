@@ -42,6 +42,25 @@ class FamilySurveyTransparentClassroomClient(wf_core_data.TransparentClassroomCl
                     form_datum[field_name_lookup[key]] = value
                 form_data.append(form_datum)
         form_data = pd.DataFrame(form_data)
+        form_data['pull_datetime'] = pd.to_datetime(form_data['pull_datetime'], utc=True)
+        form_data['form_created_at'] = pd.to_datetime(form_data['form_created_at'], utc=True)
+        form_data['form_created_at'] = pd.to_datetime(form_data['form_created_at'], utc=True)
+        form_data['form_updated_at'] = pd.to_datetime(form_data['form_updated_at'], utc=True)
+        form_data['form_last_emailed_at'] = pd.to_datetime(form_data['form_last_emailed_at'], utc=True)
+        form_data['form_due_date'] = pd.to_datetime(form_data['form_due_date'], utc=True)
+        form_data = form_data.astype({
+                'school_id_tc': 'int',
+                'form_id_tc': 'int',
+                'form_template_id_tc': 'int',
+                'form_state': 'string',
+                'nps_response': 'string',
+                'feedback_response': 'string',
+                'language_response': 'string',
+                'household_size_response': 'string',
+                'household_income_response': 'string',
+                'frl_response': 'string',
+                'marketing_opt_out_response': 'string'
+        })
         form_data.set_index(['school_id_tc', 'form_id_tc'], inplace=True)
         return form_data
 

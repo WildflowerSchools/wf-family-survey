@@ -43,10 +43,9 @@ class FamilySurveyTransparentClassroomClient(wf_core_data.TransparentClassroomCl
                 form_data.append(form_datum)
         form_data = pd.DataFrame(form_data)
         form_data['pull_datetime'] = pd.to_datetime(form_data['pull_datetime'], utc=True)
-        form_data['form_created_at'] = pd.to_datetime(form_data['form_created_at'], utc=True)
-        form_data['form_created_at'] = pd.to_datetime(form_data['form_created_at'], utc=True)
-        form_data['form_updated_at'] = pd.to_datetime(form_data['form_updated_at'], utc=True)
-        form_data['form_last_emailed_at'] = pd.to_datetime(form_data['form_last_emailed_at'], utc=True)
+        form_data['form_created'] = pd.to_datetime(form_data['form_created_at'], utc=True)
+        form_data['form_updated'] = pd.to_datetime(form_data['form_updated_at'], utc=True)
+        form_data['form_last_emailed'] = pd.to_datetime(form_data['form_last_emailed_at'], utc=True)
         form_data['form_due_date'] = pd.to_datetime(form_data['form_due_date'], utc=True)
         form_data = form_data.astype({
                 'school_id_tc': 'int',

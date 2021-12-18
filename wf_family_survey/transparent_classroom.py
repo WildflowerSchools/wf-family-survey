@@ -50,6 +50,7 @@ class FamilySurveyTransparentClassroomClient(wf_core_data.TransparentClassroomCl
         form_data = form_data.astype({
                 'school_id_tc': 'int',
                 'form_id_tc': 'int',
+                'student_id_tc': 'int',
                 'form_template_id_tc': 'int',
                 'form_state': 'string',
                 'nps_response': 'string',

@@ -111,7 +111,7 @@ class FamilySurveyAirtableClient(wf_core_data.AirtableClient):
                 ('excluded_classroom_input_id_at', record.get('id')),
                 ('excluded_classroom_input_created_datetime_at', wf_core_data.utils.to_datetime(record.get('createdTime'))),
                 ('pull_datetime', pull_datetime),
-                ('school_id_at', fields.get('Schools')),
+                ('school_id_tc', fields.get('TC school ID')),
                 ('classroom_id_tc', fields.get('TC classroom ID'))
             ])
             excluded_classroom_inputs.append(datum)
@@ -148,7 +148,7 @@ class FamilySurveyAirtableClient(wf_core_data.AirtableClient):
                 ('excluded_student_input_id_at', record.get('id')),
                 ('excluded_student_input_created_datetime_at', wf_core_data.utils.to_datetime(record.get('createdTime'))),
                 ('pull_datetime', pull_datetime),
-                ('school_id_at', fields.get('Schools')),
+                ('school_id_tc', fields.get('TC school ID')),
                 ('student_id_tc', fields.get('TC student ID'))
             ])
             excluded_student_inputs.append(datum)
@@ -245,11 +245,10 @@ def convert_excluded_classroom_inputs_to_df(excluded_classroom_inputs):
     )
     excluded_classroom_inputs_df['pull_datetime'] = pd.to_datetime(excluded_classroom_inputs_df['pull_datetime'])
     excluded_classroom_inputs_df['excluded_classroom_input_created_datetime_at'] = pd.to_datetime(excluded_classroom_inputs_df['excluded_classroom_input_created_datetime_at'])
-    excluded_classroom_inputs_df['school_id_at'] = excluded_classroom_inputs_df['school_id_at'].apply(wf_core_data.utils.to_singleton)
     excluded_classroom_inputs_df = excluded_classroom_inputs_df.astype({
         'excluded_classroom_input_id_at': 'string',
-        'school_id_at': 'string',
-        'classroom_id_tc': 'Int64'
+        'school_id_tc': 'int',
+        'classroom_id_tc': 'int'
     })
     excluded_classroom_inputs_df.set_index('excluded_classroom_input_id_at', inplace=True)
     return excluded_classroom_inputs_df
@@ -263,11 +262,10 @@ def convert_excluded_student_inputs_to_df(excluded_student_inputs):
     )
     excluded_student_inputs_df['pull_datetime'] = pd.to_datetime(excluded_student_inputs_df['pull_datetime'])
     excluded_student_inputs_df['excluded_student_input_created_datetime_at'] = pd.to_datetime(excluded_student_inputs_df['excluded_student_input_created_datetime_at'])
-    excluded_student_inputs_df['school_id_at'] = excluded_student_inputs_df['school_id_at'].apply(wf_core_data.utils.to_singleton)
     excluded_student_inputs_df = excluded_student_inputs_df.astype({
         'excluded_student_input_id_at': 'string',
-        'school_id_at': 'string',
-        'student_id_tc': 'Int64'
+        'school_id_tc': 'int',
+        'student_id_tc': 'int'
     })
     excluded_student_inputs_df.set_index('excluded_student_input_id_at', inplace=True)
     return excluded_student_inputs_df

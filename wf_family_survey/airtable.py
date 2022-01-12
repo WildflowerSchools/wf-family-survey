@@ -197,6 +197,52 @@ class FamilySurveyAirtableClient(wf_core_data.AirtableClient):
             raise ValueError('Data format \'{}\' not recognized'.format(format))
         return field_name_inputs
 
+    def fetch_non_tc_form_data(
+        self,
+        pull_datetime=None,
+        params=None,
+        base_id=wf_core_data.SCHOOLS_BASE_ID,
+        format='dataframe',
+        delay=wf_core_data.DEFAULT_DELAY,
+        max_requests=wf_core_data.DEFAULT_MAX_REQUESTS
+    ):
+        pull_datetime = wf_core_data.utils.to_datetime(pull_datetime)
+        if pull_datetime is None:
+            pull_datetime = datetime.datetime.now(tz=datetime.timezone.utc)
+        logger.info('Fetching family survey paper form data from Airtable')
+        records = self.bulk_get(
+            base_id=base_id,
+            endpoint='Family survey non-TC data 2021-22',
+            params=params
+        )
+        non_tc_form_data=list()
+        for record in records:
+            fields = record.get('fields', {})
+            datum = OrderedDict([
+                ('non_tc_form_id_at', record.get('id')),
+                ('non_tc_form_created_datetime_at', wf_core_data.utils.to_datetime(record.get('createdTime'))),
+                ('pull_datetime', pull_datetime),
+                ('school_id_at', fields.get('school_id_at')),
+                ('student_id_at_auto', wf_core_data.utils.extract_int(fields.get('student_id_at_auto'))),
+                ('student_first_name_at', fields.get('student_first_name_at')),
+                ('student_last_name_at', fields.get('student_last_name_at')),
+                ('ethnicity_category_id_at_list', fields.get('ethnicity_list')),
+                ('language_response', fields.get('language_response')),
+                ('household_income_category_id_at', fields.get('household_income')),
+                ('frl_boolean_category_id_at', fields.get('frl')),
+                ('nps_response', wf_core_data.utils.extract_int(fields.get('nps_response'))),
+                ('marketing_opt_out_boolean_category_id_at', fields.get('marketing_opt_out')),
+                ('feedback_response', fields.get('feedback_response'))
+            ])
+            non_tc_form_data.append(datum)
+        if format == 'dataframe':
+            non_tc_form_data = convert_non_tc_form_data_to_df(non_tc_form_data)
+        elif format == 'list':
+            pass
+        else:
+            raise ValueError('Data format \'{}\' not recognized'.format(format))
+        return non_tc_form_data
+
 def convert_school_inputs_to_df(school_inputs):
     if len(school_inputs) == 0:
         return pd.DataFrame()
@@ -286,3 +332,31 @@ def convert_field_name_inputs_to_df(field_name_inputs):
     })
     field_name_inputs_df.set_index('field_name_input_id_at', inplace=True)
     return field_name_inputs_df
+
+def convert_non_tc_form_data_to_df(non_tc_form_data):
+    if len(non_tc_form_data) == 0:
+        return pd.DataFrame()
+    non_tc_form_data_df = pd.DataFrame(
+        non_tc_form_data,
+        dtype='object'
+    )
+    non_tc_form_data_df['pull_datetime'] = pd.to_datetime(non_tc_form_data_df['pull_datetime'])
+    non_tc_form_data_df['non_tc_form_created_datetime_at'] = pd.to_datetime(non_tc_form_data_df['non_tc_form_created_datetime_at'])
+    non_tc_form_data_df['school_id_at'] = non_tc_form_data_df['school_id_at'].apply(wf_core_data.utils.to_singleton)
+    non_tc_form_data_df['household_income_category_id_at'] = non_tc_form_data_df['household_income_category_id_at'].apply(wf_core_data.utils.to_singleton)
+    non_tc_form_data_df['frl_boolean_category_id_at'] = non_tc_form_data_df['frl_boolean_category_id_at'].apply(wf_core_data.utils.to_singleton)
+    non_tc_form_data_df['marketing_opt_out_boolean_category_id_at'] = non_tc_form_data_df['marketing_opt_out_boolean_category_id_at'].apply(wf_core_data.utils.to_singleton)
+    non_tc_form_data_df = non_tc_form_data_df.astype({
+        'school_id_at': 'string',
+        'student_id_at_auto': 'int',
+        'student_first_name_at': 'string',
+        'student_last_name_at': 'string',
+        'language_response': 'string',
+        'household_income_category_id_at': 'string',
+        'frl_boolean_category_id_at': 'string',
+        'nps_response': 'Int64',
+        'marketing_opt_out_boolean_category_id_at': 'string',
+        'feedback_response': 'string'
+    })
+    non_tc_form_data_df.set_index('non_tc_form_id_at', inplace=True)
+    return non_tc_form_data_df

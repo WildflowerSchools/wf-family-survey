@@ -115,7 +115,7 @@ class FamilySurveyTransparentClassroomClient(wf_core_data.TransparentClassroomCl
         network_form_template_data = self.fetch_family_survey_network_form_template_data(
             template_name_re=template_name_re
         )
-        family_survey_network_form_template_ids = family_survey_network_form_template_ids = list(
+        family_survey_network_form_template_ids = list(
             network_form_template_data.index[network_form_template_data['is_family_survey_template']]
         )
         return family_survey_network_form_template_ids

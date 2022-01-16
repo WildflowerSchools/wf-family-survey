@@ -47,20 +47,22 @@ class FamilySurveyTransparentClassroomClient(wf_core_data.TransparentClassroomCl
         form_data['form_updated'] = pd.to_datetime(form_data['form_updated'], utc=True)
         form_data['form_last_emailed'] = pd.to_datetime(form_data['form_last_emailed'], utc=True)
         form_data['form_due_date'] = pd.to_datetime(form_data['form_due_date'], utc=True)
-        form_data = form_data.astype({
-                'school_id_tc': 'int',
-                'form_id_tc': 'int',
-                'student_id_tc': 'int',
-                'form_template_id_tc': 'int',
-                'form_state': 'string',
-                'nps_response': 'string',
-                'feedback_response': 'string',
-                'language_response': 'string',
-                'household_size_response': 'string',
-                'household_income_response': 'string',
-                'frl_response': 'string',
-                'marketing_opt_out_response': 'string'
-        })
+        type_dict_all = {
+            'school_id_tc': 'int',
+            'form_id_tc': 'int',
+            'student_id_tc': 'int',
+            'form_template_id_tc': 'int',
+            'form_state': 'string',
+            'nps_response': 'string',
+            'feedback_response': 'string',
+            'language_response': 'string',
+            'household_size_response': 'string',
+            'household_income_response': 'string',
+            'frl_response': 'string',
+            'marketing_opt_out_response': 'string'
+        }
+        type_dict = {column: type_dict_all[column] for column in form_data.columns if column in type_dict_all.keys()}
+        form_data = form_data.astype(type_dict)
         form_data.set_index(['school_id_tc', 'form_id_tc'], inplace=True)
         return form_data
 

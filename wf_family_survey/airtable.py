@@ -37,7 +37,8 @@ class FamilySurveyAirtableClient(wf_core_data.AirtableClient):
                 ('include_school_in_data', fields.get('Include in data')),
                 ('include_school_in_reporting', fields.get('Include in reporting')),
                 ('school_data_pending', fields.get('Data pending')),
-                ('school_report_language', fields.get('Report language'))
+                ('school_report_language', fields.get('Report language')),
+                ('school_student_count', fields.get('Student count'))
             ])
             school_inputs.append(datum)
         if format == 'dataframe':
@@ -258,7 +259,8 @@ def convert_school_inputs_to_df(school_inputs):
         'school_id_at': 'string',
         'include_school_in_data': 'bool',
         'include_school_in_reporting': 'bool',
-        'school_data_pending': 'bool'
+        'school_data_pending': 'bool',
+        'school_student_count': 'Int64'
     })
     school_inputs_df.set_index('school_input_id_at', inplace=True)
     return school_inputs_df
